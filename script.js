@@ -10,6 +10,7 @@ dateEl.setAttribute('min', currentDateString);
 const countdown = document.getElementById('countdown');
 const countdownTitle = document.getElementById('countdown-title');
 const timeElements = document.querySelectorAll('span');
+const resetButton = document.getElementById('countdown-button');
 
 const complete = document.getElementById('complete');
 const completeTitle = document.getElementById('complete-title');
@@ -37,6 +38,10 @@ function setCountDown(e) {
   e.preventDefault();
   countdownTitleInput = e.srcElement[0].value;
   countdownDate = e.srcElement[1].value;
+  if(countdownDate === '') {
+      alert('Please select a date');
+      return;
+  }
   inputContainer.hidden = true;
 
   const timer = new Date(countdownDate);
@@ -70,8 +75,7 @@ function updateCountDown() {
     timeElements.forEach((item) => {
       if (item.textContent !== '0') stopInterval = false;
     });
-    stopInterval = true;
-
+    
     if (stopInterval) {
       clearInterval(intervalActive);
       localStorage.removeItem(countDownKey);
@@ -85,7 +89,11 @@ function newCountDown() {
   inputContainer.hidden = false;
   countdown.hidden = true;
   complete.hidden = true;
+  countdownTitleInput = '';
+  countdownDate = '';
+  if (intervalActive != null) clearInterval(intervalActive);
 }
 
 countdownForm.addEventListener('submit', setCountDown);
 newCountDownButton.addEventListener('click', newCountDown);
+resetButton.addEventListener('click', newCountDown);

@@ -23,7 +23,10 @@ let countdownDate = '';
 let intervalActive;
 let stopInterval = true;
 
+const second = 1000;
+
 const countDownKey = 'countDown';
+const countDownTitleKey = 'title';
 
 function setSpanElements(timer, currentDate) {
   timeElements[0].textContent = Math.abs(
@@ -34,14 +37,7 @@ function setSpanElements(timer, currentDate) {
   timeElements[3].textContent = 60 - currentDate.getSeconds();
 }
 
-function setCountDown(e) {
-  e.preventDefault();
-  countdownTitleInput = e.srcElement[0].value;
-  countdownDate = e.srcElement[1].value;
-  if(countdownDate === '') {
-      alert('Please select a date');
-      return;
-  }
+function updateDOM() {
   inputContainer.hidden = true;
 
   const timer = new Date(countdownDate);
@@ -49,8 +45,6 @@ function setCountDown(e) {
   setSpanElements(timer, currentDate);
   countdownTitle.textContent = countdownTitleInput;
   countdown.hidden = false;
-
-  localStorage.setItem(countDownKey, timer);
 
   completeTitle.textContent = countdownTitleInput;
   completeInfo.textContent =
@@ -62,7 +56,21 @@ function setCountDown(e) {
     timer.getFullYear();
   complete.hidden = true;
 
-  intervalActive = setInterval(updateCountDown, 1000);
+  intervalActive = setInterval(updateCountDown, second);
+  return timer;
+}
+
+function setCountDown(e) {
+  e.preventDefault();
+  countdownTitleInput = e.srcElement[0].value;
+  countdownDate = e.srcElement[1].value;
+  if (countdownDate === '') {
+    alert('Please select a date');
+    return;
+  }
+  const timer = updateDOM();
+  localStorage.setItem(countDownKey, timer);
+  localStorage.setItem(countDownTitleKey, countdownTitleInput);
 }
 
 function updateCountDown() {
@@ -75,7 +83,7 @@ function updateCountDown() {
     timeElements.forEach((item) => {
       if (item.textContent !== '0') stopInterval = false;
     });
-    
+
     if (stopInterval) {
       clearInterval(intervalActive);
       localStorage.removeItem(countDownKey);
@@ -92,8 +100,23 @@ function newCountDown() {
   countdownTitleInput = '';
   countdownDate = '';
   if (intervalActive != null) clearInterval(intervalActive);
+  localStorage.removeItem(countDownKey);
+}
+
+function restorePreviosCountdown() {
+  if (localStorage.getItem(countDownKey) !== null) {
+
+    countdownDate = localStorage.getItem(countDownKey);
+    countdownTitleInput = localStorage.getItem(countDownTitleKey);
+    
+    updateDOM();
+
+    intervalActive = setInterval(updateCountDown, second);
+  }
 }
 
 countdownForm.addEventListener('submit', setCountDown);
 newCountDownButton.addEventListener('click', newCountDown);
 resetButton.addEventListener('click', newCountDown);
+
+restorePreviosCountdown();

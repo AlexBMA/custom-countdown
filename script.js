@@ -101,14 +101,14 @@ function newCountDown() {
   countdownDate = '';
   if (intervalActive != null) clearInterval(intervalActive);
   localStorage.removeItem(countDownKey);
+  localStorage.removeItem(countDownTitleKey);
 }
 
 function restorePreviosCountdown() {
   if (localStorage.getItem(countDownKey) !== null) {
-
     countdownDate = localStorage.getItem(countDownKey);
     countdownTitleInput = localStorage.getItem(countDownTitleKey);
-    
+
     updateDOM();
 
     intervalActive = setInterval(updateCountDown, second);
